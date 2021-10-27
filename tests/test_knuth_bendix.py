@@ -68,7 +68,7 @@ class TestKnuthBendix(unittest.TestCase):
     
        
     # Tests from libsemigroups
-    def test_006(self):
+    def test_005(self):
         kb = KnuthBendix()
         kb.set_alphabet("ab")
         kb.add_rule("aa", "")
