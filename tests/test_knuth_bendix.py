@@ -65,6 +65,8 @@ class TestKnuthBendix(unittest.TestCase):
     def test_running_and_state():
         check_running_and_state(KnuthBendix)
 
+    
+       
     # Tests from libsemigroups
     def test_006(self):
         kb = KnuthBendix()
