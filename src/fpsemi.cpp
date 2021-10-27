@@ -1,6 +1,10 @@
 //
 // libsemigroups - C++ library for semigroups and monoids
+<<<<<<< HEAD
 // Copyright (C) 2020 James D. Mitchell
+=======
+// Copyright (C) 2021 James D. Mitchell
+>>>>>>> 520c177fd93bba034bb0fad0b54f0af2d4fca119
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +20,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+<<<<<<< HEAD
 // Status: complete
 
 #include <pybind11/chrono.h>
@@ -27,6 +32,38 @@
 #include <libsemigroups/libsemigroups.hpp>
 
 #include "main.hpp"
+=======
+// C std headers....
+#include <stddef.h>  // for size_t
+
+// C++ stl headers....
+#include <array>             // for array
+#include <chrono>            // for nanoseconds
+#include <functional>        // for function
+#include <initializer_list>  // for initializer_list
+#include <iosfwd>            // for string
+#include <memory>            // for shared_ptr
+#include <vector>            // for vector
+
+// libsemigroups....
+#include <libsemigroups/fpsemi-intf.hpp>  // for FpSemigroupInterface
+#include <libsemigroups/fpsemi.hpp>  // for FpSemigroup, FpSemigroup::equal_to
+#include <libsemigroups/runner.hpp>  // for Runner
+#include <libsemigroups/types.hpp>   // for word_type, letter_type, relation...
+
+// pybind11....
+#include <pybind11/chrono.h>
+#include <pybind11/functional.h>
+#include <pybind11/pybind11.h>  // for class_, init, make_iterator, module
+#include <pybind11/stl.h>
+
+// libsemigroups_pybind11....
+#include "main.hpp"  // for init_fpsemi
+
+namespace libsemigroups {
+  class FroidurePinBase;
+}
+>>>>>>> 520c177fd93bba034bb0fad0b54f0af2d4fca119
 
 namespace py = pybind11;
 
@@ -222,7 +259,11 @@ namespace libsemigroups {
              R"pbdoc(
                Add the rules of a finite presentation for S to this.
 
+<<<<<<< HEAD
                :Parameters: **S** (??) - a FroidurePin object representing a semigroup.
+=======
+               :Parameters: **S** (:py:class:`FroidurePin`) - a FroidurePin object representing a semigroup.
+>>>>>>> 520c177fd93bba034bb0fad0b54f0af2d4fca119
 
                :Returns: (None)
                )pbdoc")
@@ -238,9 +279,16 @@ namespace libsemigroups {
 
                :Returns: (None)
                )pbdoc")
+<<<<<<< HEAD
         .def("number_of_rules",
              &FpSemigroup::number_of_rules,
              R"pbdoc(
+=======
+        .def(
+            "number_of_rules",
+            [](FpSemigroup const &fp) { return fp.number_of_rules(); },
+            R"pbdoc(
+>>>>>>> 520c177fd93bba034bb0fad0b54f0af2d4fca119
                Returns the number of rules currently used to define the
                finitely presented semigroups.
 
@@ -344,9 +392,16 @@ namespace libsemigroups {
 
                :return: A ``bool``.
                )pbdoc")
+<<<<<<< HEAD
         .def("running",
              &FpSemigroup::running,
              R"pbdoc(
+=======
+        .def(
+            "running",
+            [](FpSemigroup const &fp) { return fp.running(); },
+            R"pbdoc(
+>>>>>>> 520c177fd93bba034bb0fad0b54f0af2d4fca119
                Check if the algorithm is currently running.
 
                :return: ``True`` if algorithm is in the process of running and ``False`` it is not.
@@ -453,6 +508,7 @@ namespace libsemigroups {
                :type a: str
 
                :return: An ``int``.
+<<<<<<< HEAD
                )pbdoc")
         .def("has_froidure_pin",
              &FpSemigroup::has_froidure_pin,
@@ -471,6 +527,28 @@ namespace libsemigroups {
 
                :return: A ``FroidurePin`` instance.
                )pbdoc")
+=======
+             )pbdoc")
+        .def(
+            "has_froidure_pin",
+            [](FpSemigroup const &x) { return x.has_froidure_pin(); },
+            R"pbdoc(
+              Returns True if a ``FroidurePin`` instance isomorphic to the
+              finitely presented semigroup has already been
+              computed, and False if not.
+
+              :return: A ``bool``.
+            )pbdoc")
+        .def(
+            "froidure_pin",
+            [](FpSemigroup &x) { return x.froidure_pin(); },
+            R"pbdoc(
+              Returns a ``FroidurePin`` instance isomorphic to the finitely
+              presented semigroup.
+
+              :return: A ``FroidurePin`` instance.
+            )pbdoc")
+>>>>>>> 520c177fd93bba034bb0fad0b54f0af2d4fca119
         .def("has_knuth_bendix",
              &FpSemigroup::has_knuth_bendix,
              R"pbdoc(

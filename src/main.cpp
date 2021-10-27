@@ -1,6 +1,6 @@
 //
 // libsemigroups - C++ library for semigroups and monoids
-// Copyright (C) 2020 James D. Mitchell
+// Copyright (C) 2021 James D. Mitchell
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,70 +16,41 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <pybind11/chrono.h>
-#include <pybind11/functional.h>
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include <libsemigroups/libsemigroups.hpp>
-
 #include "main.hpp"
+
+// C std headers....
+#include <stddef.h>  // for size_t
+
+// C++ stl headers....
+#include <initializer_list>  // for initializer_list
+
+// libsemigroups....
+#include <libsemigroups/cong-intf.hpp>  // for congruence_kind, congruence_kind:...
+#include <libsemigroups/constants.hpp>  // for PositiveInfinity, Undefined, POSI...
+#include <libsemigroups/kbe.hpp>        // for KBE, operator<<
+#include <libsemigroups/report.hpp>     // for ReportGuard
+#include <libsemigroups/string.hpp>     // for to_string
+#include <libsemigroups/tce.hpp>        // for TCE
+#include <libsemigroups/types.hpp>      // for tril, tril::FALSE, tril::TRUE
+
+// pybind11....
+#include <pybind11/operators.h>  // for self, operator<, operator==, self_t
+#include <pybind11/pybind11.h>   // for module_, class_, enum_, init
 
 namespace py = pybind11;
 
 namespace libsemigroups {
 
-//  using Transf            = Transformation<uint8_t>;
-//  using FroidurePinTransf = FroidurePin<Transf>;
 
-namespace detail {
-//    std::string transf_repr(Transformation<uint8_t> const &a) {
-//      auto out = std::string("Transf256([");
-//      for (size_t i = 0; i < a.degree(); ++i) {
-//        out += detail::to_string(size_t(a[i]));
-//        if (i != a.degree() - 1) {
-//         out += ", ";
-//        }
-//      }
-//      out += "])";
-//      return out;
-//    }
-//
-    template <typename T>
-    void bind_froidure_pin(py::module &m, std::string typestr) {
-      using Class              = FroidurePin<T>;
-      std::string pyclass_name = std::string("FroidurePin") + typestr;
-      py::class_<Class>(
-          m, pyclass_name.c_str(), py::buffer_protocol(), py::dynamic_attr())
-          .def(py::init<std::vector<T> const &>())
-          .def(py::init<>())
-          .def("size", &Class::size)
-          .def("add_generator", &Class::add_generator)
-          .def("number_of_generators", &Class::number_of_generators)
-          .def("batch_size", py::overload_cast<size_t>(&Class::batch_size))
-          .def("batch_size",
-               py::overload_cast<>(&Class::batch_size, py::const_))
-          .def("max_threads", py::overload_cast<size_t>(&Class::max_threads))
-          .def("max_threads",
-               py::overload_cast<>(&Class::max_threads, py::const_))
-          .def("concurrency_threshold",
-               py::overload_cast<size_t>(&Class::concurrency_threshold))
-          .def("concurrency_threshold",
-               py::overload_cast<>(&Class::concurrency_threshold, py::const_))
-          .def("reserve", &Class::reserve);
-    }
-  }  // namespace detail
-
-  PYBIND11_MODULE(libsemigroups_pybind11, m) {
-    // py::options options;
-    // options.disable_function_signatures();
-
+  PYBIND11_MODULE(_libsemigroups_pybind11, m) {
     ////////////////////////////////////////////////////////////////////////
     // Enums
     ////////////////////////////////////////////////////////////////////////
 
-    py::enum_<congruence_kind>(m, "congruence_kind")
+    py::enum_<congruence_kind>(m, "congruence_kind", R"pbdoc(
+      The values in this class can be used to indicate that a congruence should
+      be 2-sided, left, or right.
+    )pbdoc")
         .value("left", congruence_kind::left)
         .value("right", congruence_kind::right)
         .value("twosided", congruence_kind::twosided)
@@ -91,44 +62,77 @@ namespace detail {
         .value("unknown", tril::unknown)
         .export_values();
 
+<<<<<<< HEAD
     py::class_<ReportGuard>(m, "ReportGuard").def(py::init<bool>());
 
     init_action_digraph(m);
+=======
+    py::class_<ReportGuard>(m,
+                            "ReportGuard",
+                            R"pbdoc(
+      Objects of this type can be used to enable printing of some information
+      during various of the computation in ``libsemigroups_pybind11``. Reporting
+      is enable (or not) at construction time, and disable when the
+      :py:class:`ReportGuard` goes out of scope.
+    )pbdoc")
+        .def(py::init<bool>(),
+             py::arg("val") = true,
+             R"pbdoc(
+     Constructs a :py:class:`ReportGuard` with reporting enabled by default.
+
+     :param val: whether to report or not (default: ``True``).
+     :type val: bool
+    )pbdoc");
+
+    ////////////////////////////////////////////////////////////////////////
+    // Constants
+    ////////////////////////////////////////////////////////////////////////
+
+    // TODO(later) do this properly
+    m.attr("UNDEFINED") = py::int_(static_cast<size_t>(UNDEFINED));
+
+    m.attr("POSITIVE_INFINITY")
+        = py::int_(static_cast<size_t>(POSITIVE_INFINITY));
+
+    ////////////////////////////////////////////////////////////////////////
+    // Things so short they don't merit their own file
+    ////////////////////////////////////////////////////////////////////////
+
+    using TCE = detail::TCE;
+    py::class_<TCE>(m, "TCE")
+        .def("__repr__", &detail::to_string<TCE>)
+        .def(pybind11::self == pybind11::self)
+        .def(pybind11::self < pybind11::self);
+
+    using KBE = detail::KBE;
+    py::class_<KBE>(m, "KBE")
+        .def("__repr__", &detail::to_string<KBE>)
+        .def(pybind11::self == pybind11::self)
+        .def(pybind11::self < pybind11::self);
+
+    ////////////////////////////////////////////////////////////////////////
+    // Init
+    ////////////////////////////////////////////////////////////////////////
+
+    init_forest(m);
+    init_action_digraph(m);
+    init_bipart(m);
     init_bmat8(m);
     init_cong(m);
     init_fpsemi(m);
     init_knuth_bendix(m);
+    init_matrix(m);
+    init_pbr(m);
     init_todd_coxeter(m);
+    init_transf(m);
     init_words(m);
 
-    ////////////////////////////////////////////////////////////////////////
-    // element.hpp
-    ////////////////////////////////////////////////////////////////////////
+    init_froidure_pin(m);
 
- //   py::class_<Transformation<uint8_t>>(m, "Transf256")
- //      .def(py::init<std::vector<uint8_t> const &>())
- //     .def("rank",
- //          &Transformation<uint8_t>::crank,
- //          R"pbdoc(
- //      Add two numbers
-
- //     Some other explanation about the add function.
- //  )pbdoc")
- //     .def("degree", &Transformation<uint8_t>::degree)
- //    .def(py::self * py::self)
- //   .def(
- //      "__getitem__",
- //    [](const Transformation<uint8_t> &a, size_t b) { return a[b]; },
- //      py::is_operator())
- //       .def("__repr__", &detail::transf_repr);
-
- //   detail::bind_froidure_pin<Transf>(m, "Transf256");
- //   detail::bind_froidure_pin<BMat8>(m, "BMat8");
-
- #ifdef VERSION_INFO
-   m.attr("__version__") = VERSION_INFO;
- #else
-   m.attr("__version__") = "dev";
+#ifdef VERSION_INFO
+    m.attr("__version__") = VERSION_INFO;
+#else
+    m.attr("__version__") = "dev";
 #endif
   }
 }  // namespace libsemigroups

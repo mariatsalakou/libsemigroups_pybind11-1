@@ -1,4 +1,4 @@
-.. Copyright (c) 2019, J. D. Mitchell
+.. Copyright (c) 2021, J. D. Mitchell
 
    Distributed under the terms of the GPL license version 3.
 
@@ -8,7 +8,7 @@ Miscellaneous
 =============
 
 In this section we describe some miscellaneous functionality in
-``libsemigroups``. 
+``libsemigroups_pybind11``. 
 
 .. toctree::
    :maxdepth: 1

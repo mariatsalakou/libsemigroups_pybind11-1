@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+# pylint: disable=no-name-in-module, missing-function-docstring
+# pylint: disable=missing-class-docstring, invalid-name
+
+# Copyright (c) 2021, J. D. Mitchell + Maria Tsalakou
+#
+# Distributed under the terms of the GPL license version 3.
+#
+# The full license is in the file LICENSE, distributed with this software.
+
 """
 This module contains some functions used in tests for FpSemigroupInterface
 derived classes, i.e. KnuthBendix, FpSemigroup, etc.
@@ -5,7 +15,8 @@ derived classes, i.e. KnuthBendix, FpSemigroup, etc.
 
 from datetime import timedelta
 
-from libsemigroups_pybind11 import FpSemigroup, ReportGuard
+from runner import check_runner
+from libsemigroups_pybind11 import ReportGuard, FroidurePin, Transf
 
 
 def check_validation(self, t):
@@ -17,7 +28,7 @@ def check_validation(self, t):
         x.validate_letter("c")
     try:
         x.validate_letter("a")
-    except Exception as e:
+    except RuntimeError as e:
         self.fail(
             "unexpected exception raised for FpSemigroupInterface::validate_letter: "
             + e
@@ -27,7 +38,7 @@ def check_validation(self, t):
         x.validate_letter(3)
     try:
         x.validate_letter(0)
-    except Exception as e:
+    except RuntimeError as e:
         self.fail(
             "unexpected exception raised for FpSemigroupInterface::validate_letter: "
             + e
@@ -36,7 +47,7 @@ def check_validation(self, t):
         x.validate_word("abc")
     try:
         x.validate_word("abab")
-    except Exception as e:
+    except RuntimeError as e:
         self.fail(
             "unexpected exception raised for FpSemigroupInterface::validate_letter: "
             + e
@@ -47,7 +58,7 @@ def check_validation(self, t):
 
     try:
         x.validate_word([0, 1, 0, 1])
-    except Exception as e:
+    except RuntimeError as e:
         self.fail(
             "unexpected exception raised for FpSemigroupInterface::validate_letter: "
             + e
@@ -86,9 +97,10 @@ def check_initialisation(self, t):
     with self.assertRaises(RuntimeError):
         x.add_rule([0, 1], [2])
 
-    # S = FroidurePin(Transformation([1, 2, 0]), Transformation([1, 0, 2]))
-    # x.add_rules(S)
-    # self.assertEqual(x.size(), 2)
+    S = FroidurePin([Transf([1, 2, 0]), Transf([1, 0, 2])])
+    S.run()
+    x.add_rules(S)
+    self.assertEqual(x.size(), 2)
 
     x = t()
     x.set_alphabet("abBe")
@@ -118,7 +130,7 @@ def check_attributes(self, t):
     x.run()
 
     self.assertEqual(
-        [y for y in x.rules()],
+        list(x.rules()),
         [
             ("ae", "a"),
             ("ea", "a"),
@@ -134,11 +146,11 @@ def check_attributes(self, t):
             ("BaBa", "abab"),
         ],
     )
-    self.assertEqual(x.nr_rules(), 12)
+    self.assertEqual(x.number_of_rules(), 12)
 
     self.assertEqual(x.alphabet(), "abBe")
-    # self.assertFalse(x.has_froidure_pin())
-    # self.assertEqual(x.froidure_pin().size(), 24)
+    self.assertFalse(x.has_froidure_pin())
+    self.assertEqual(x.froidure_pin().size(), 24)
     self.assertEqual(x.identity(), "e")
     self.assertEqual(x.inverses(), "aBbe")
     self.assertFalse(x.is_obviously_infinite())
@@ -182,9 +194,9 @@ def check_operators(self, t):
             self.assertEqual(x.rewrite("z"))
 
 
-def check_running_and_state(self, t):
+def check_running_and_state(T):
     ReportGuard(False)
-    x = t()
+    x = T()
     x.set_alphabet("abce")
     x.set_identity("e")
     x.add_rule("aa", "e")
@@ -192,36 +204,4 @@ def check_running_and_state(self, t):
     x.add_rule("bbb", "e")
     x.add_rule("ababababababab", "e")
     x.add_rule("abacabacabacabacabacabacabacabac", "e")
-    x.run_for(timedelta(microseconds=1))
-
-    self.assertTrue(x.stopped())
-    self.assertFalse(x.finished())
-    self.assertFalse(x.running())
-    self.assertTrue(x.started())
-    self.assertFalse(x.stopped_by_predicate())
-    self.assertTrue(x.timed_out())
-
-    x = t()
-    x.set_alphabet("abce")
-    x.set_identity("e")
-    x.add_rule("aa", "e")
-    x.add_rule("bc", "e")
-    x.add_rule("bbb", "e")
-    x.add_rule("ababababababab", "e")
-    x.add_rule("abacabacabacabacabacabacabacabac", "e")
-
-    n = 0
-
-    def func():
-        nonlocal n
-        n += 1
-        return n == 2
-
-    x.run_until(func)
-
-    self.assertTrue(x.stopped())
-    self.assertFalse(x.finished())
-    self.assertFalse(x.running())
-    self.assertTrue(x.started())
-    self.assertTrue(x.stopped_by_predicate())
-    self.assertFalse(x.timed_out())
+    check_runner(x, timedelta(microseconds=1000))

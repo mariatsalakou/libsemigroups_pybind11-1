@@ -1,6 +1,6 @@
 //
 // libsemigroups - C++ library for semigroups and monoids
-// Copyright (C) 2020 James D. Mitchell
+// Copyright (C) 2021 James D. Mitchell
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,26 +16,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef LIBSEMIGROUPS_PYBIND11_MAIN_HPP_
-#define LIBSEMIGROUPS_PYBIND11_MAIN_HPP_
+#ifndef SRC_MAIN_HPP_
+#define SRC_MAIN_HPP_
 
-#include <pybind11/chrono.h>
-#include <pybind11/functional.h>
-#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
 namespace libsemigroups {
   namespace py = pybind11;
 
   void init_action_digraph(py::module&);
+  void init_bipart(py::module&);
   void init_bmat8(py::module&);
   void init_cong(py::module&);
+  void init_forest(py::module&);
   void init_fpsemi(py::module&);
+  void init_froidure_pin(py::module&);
   void init_knuth_bendix(py::module&);
+  void init_matrix(py::module&);
+  void init_pbr(py::module&);
   void init_todd_coxeter(py::module&);
+  void init_transf(py::module&);
   void init_words(py::module&);
 
 }  // namespace libsemigroups
 
-#endif  // LIBSEMIGROUPS_PYBIND11_MAIN_HPP_
+#endif  // SRC_MAIN_HPP_
